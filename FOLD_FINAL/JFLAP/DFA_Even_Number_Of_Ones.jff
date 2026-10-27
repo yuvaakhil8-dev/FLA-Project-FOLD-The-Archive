@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<structure><type>fa</type><automaton><state id="0" name="E"><x>180</x><y>190</y><initial /><final /></state><state id="1" name="O"><x>420</x><y>190</y></state><transition><from>0</from><to>0</to><read>0</read></transition><transition><from>0</from><to>1</to><read>1</read></transition><transition><from>1</from><to>1</to><read>0</read></transition><transition><from>1</from><to>0</to><read>1</read></transition></automaton></structure>

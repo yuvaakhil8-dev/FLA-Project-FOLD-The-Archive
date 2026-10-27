@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FOLD — THE ARCHIVE | Formal Languages & Automata Theory</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="crt-scanlines">
+
+  <!-- SYSTEM HEADER -->
+  <header class="archive-header">
+    <div class="header-branding">
+      <span class="facility-badge">THE ARCHIVE // SUB-LEVEL OS</span>
+      <h1 class="logo-title">FOLD</h1>
+    </div>
+    <div class="hud-telemetry">
+      <div class="telemetry-chip">
+        <span class="label">LOCATION:</span>
+        <span id="hud-chamber-code" class="val">ARC-01</span>
+      </div>
+      <div class="telemetry-chip chamber-name-chip">
+        <span class="label">CHAMBER:</span>
+        <span id="hud-chamber-title" class="val">The First Memory</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button id="btn-sound-toggle" class="header-btn" title="Toggle Synthesized Audio">AUDIO: ON</button>
+      <button class="header-btn btn-back-corridor" title="View Facility Corridors">CORRIDORS</button>
+      <button id="btn-settings-toggle" class="header-btn icon-btn" title="System Settings">CONFIG</button>
+    </div>
+  </header>
+
+  <!-- SCREEN 1: TITLE SCREEN -->
+  <main id="screen-title" class="game-screen active">
+    <div class="title-container">
+      <div class="title-emblem">
+        <div class="emblem-ring"></div>
+        <div class="emblem-core">FOLD</div>
+      </div>
+      <h2 class="game-tagline">"Every room is a question. Find the rooms that are really the same."</h2>
+      <p class="story-synopsis">
+        Deep within an underground memory facility, human consciousness has been compressed into state machines.
+        The Warden merges rooms it believes are identical—yet some decisions are lethal errors.
+        Explore the corridors, discover equivalent states, expose mathematical lies, and reconstruct the machines to escape.
+      </p>
+
+      <div class="title-menu">
+        <button id="btn-new-game" class="menu-btn primary">START NEW EXPLORATION</button>
+        <button id="btn-continue" class="menu-btn">CONTINUE EXPEDITION</button>
+        <button id="btn-examiner-mode" class="menu-btn examiner">EXAMINER DEMONSTRATION MODE</button>
+        <button id="btn-workshop-mode" class="menu-btn workshop">AUTOMATA WORKSHOP</button>
+      </div>
+
+      <div class="academic-footer">
+        <span>Formal Languages & Automata Theory University Mini-Project</span>
+        <span class="eval-badge">10 MARKS GAME · 10 MARKS JFLAP</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- SCREEN 2: CORRIDOR SELECTION -->
+  <main id="screen-corridor" class="game-screen">
+    <div class="corridor-container">
+      <div class="section-header">
+        <h2>FACILITY ARCHIVE SECTORS</h2>
+        <p>Seven memory chambers lie between your containment cell and the Core Extraction Gate.</p>
+      </div>
+      <div id="corridor-chambers-list" class="corridor-grid">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+      <div class="corridor-footer">
+        <button class="menu-btn btn-back-title">RETURN TO MAIN TERMINAL</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- SCREEN 3: ACTIVE CHAMBER VIEW -->
+  <main id="screen-chamber" class="game-screen">
+    <div class="chamber-layout">
+
+      <!-- LEFT COLUMN: INTERCOM, TRACES & CLUES -->
+      <aside class="chamber-sidebar-left">
+        <!-- Intercom Transmission -->
+        <div class="intercom-terminal">
+          <div class="intercom-header">
+            <span class="radio-indicator"></span>
+            <span class="label">INTERCOM TRANSMISSION</span>
+            <span id="intercom-speaker" class="intercom-badge speaker-mara">MARA</span>
+          </div>
+          <div id="intercom-message" class="intercom-body">
+            Establishing carrier frequency...
+          </div>
+        </div>
+
+        <!-- Prisoners' Traces -->
+        <div class="traces-panel">
+          <div class="panel-header">PRISONERS' TRACES (HISTORICAL LOGS)</div>
+          <div id="chamber-traces-list" class="traces-scroll-area">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Sequential Hints -->
+        <div class="hints-panel">
+          <div class="hints-header">
+            <span>CLASSIFIED CLUES</span>
+            <span id="hint-counter" class="hint-count-badge">0 / 3 REVEALED</span>
+          </div>
+          <div id="chamber-hints-list" class="hints-list"></div>
+          <button id="btn-reveal-hint" class="action-btn small-btn">REVEAL NEXT CLUE</button>
+        </div>
+      </aside>
+
+      <!-- CENTER COLUMN: VISUALIZER & SIMULATOR -->
+      <section class="chamber-main-arena">
+        <!-- Automata Diagram Visualizer -->
+        <div class="visualizer-wrapper">
+          <div class="visualizer-topbar">
+            <span class="radar-title">AUTOMATA TOPOLOGY RADAR</span>
+            <span class="legend-note">Click states to inspect / propose fold</span>
+          </div>
+          <div id="chamber-visualizer" class="canvas-container">
+            <!-- Dynamic SVG injected here -->
+          </div>
+        </div>
+
+        <!-- Special Mechanics Drawer (Chamber-Specific) -->
+        <!-- 1. The Folding Console (Chamber 2 & 5) -->
+        <div id="mechanic-fold-panel" class="special-mechanic-card">
+          <div class="mechanic-title">THE FOLDING SYSTEM (DFA MINIMISATION)</div>
+          <p class="mechanic-desc">Select 2 states on the radar that you believe behave identically for all future inputs.</p>
+          <div class="fold-controls">
+            <div class="selected-states-chip">Selected States: <span id="fold-selected-display">None</span></div>
+            <button id="btn-test-continuation" class="cipher-btn small">TEST CONTINUATION</button>
+            <button id="btn-propose-fold" class="cipher-btn primary small">PROPOSE FOLD</button>
+          </div>
+          <div id="fold-feedback-msg" class="mechanic-feedback"></div>
+        </div>
+
+        <!-- 2. The Witness Console (Chamber 4) -->
+        <div id="mechanic-witness-panel" class="special-mechanic-card">
+          <div class="mechanic-title">THE WITNESS SYSTEM (EQUIVALENCE VERIFICATION)</div>
+          <p class="mechanic-desc">The Warden claims its modified machine recognizes all strings with 101. Run a BFS product search to find the shortest distinguishing witness string.</p>
+          <button id="btn-find-witness" class="cipher-btn primary small">EXECUTE WITNESS SEARCH (BFS)</button>
+          <div id="witness-result-box" class="mechanic-feedback"></div>
+        </div>
+
+        <!-- 3. Table-Filling Matrix (Chamber 5) -->
+        <div id="mechanic-table-panel" class="special-mechanic-card">
+          <div class="mechanic-title">THE TABLE-FILLING ALGORITHM (MYHILL-NERODE)</div>
+          <p class="mechanic-desc">Mark distinguishable state pairs step-by-step. Unmarked pairs represent equivalent rooms that can be merged.</p>
+          <button id="btn-step-table-fill" class="cipher-btn primary small">RUN TABLE-FILLING ALGORITHM</button>
+          <div id="table-matrix-display" class="table-matrix-wrapper"></div>
+          <div id="table-feedback-msg" class="mechanic-feedback"></div>
+        </div>
+
+        <!-- 4. The Product Gate (Chamber 7) -->
+        <div id="mechanic-product-panel" class="special-mechanic-card">
+          <div class="mechanic-title">THE PRODUCT GATE (EVEN 1s ∩ DIVISIBLE BY 3)</div>
+          <p class="mechanic-desc">Synchronized execution of two component automata. Exit opens when both conditions accept simultaneously.</p>
+          <div id="product-grid-display" class="product-grid-wrapper"></div>
+        </div>
+
+        <!-- Simulation Result Banner -->
+        <div id="simulation-result-banner" class="result-banner idle">
+          <span>ENTER STRING OVER Σ TO INITIATE SEQUENCE</span>
+        </div>
+
+        <!-- Cipher Terminal Input & Keypad -->
+        <div class="cipher-terminal">
+          <div class="terminal-input-row">
+            <input type="text" id="cipher-input" class="cipher-field" placeholder="INPUT STRING (e.g. 01, 101, ab, ε)" autocomplete="off" spellcheck="false">
+            <button id="btn-run-simulation" class="cipher-btn primary">RUN SEQUENCE</button>
+          </div>
+
+          <!-- Step Debugger Controls -->
+          <div class="step-mode-row">
+            <label class="step-toggle-label">
+              <input type="checkbox" id="step-mode-checkbox">
+              <span class="slider"></span>
+              STEP-BY-STEP DEBUGGER
+            </label>
+            <div id="step-controls-panel" class="step-nav-buttons">
+              <button id="btn-step-prev" class="step-btn">◀ PREV</button>
+              <button id="btn-step-next" class="step-btn">NEXT ▶</button>
+              <button id="btn-step-reset" class="step-btn">RESET</button>
+              <span id="step-status-indicator" class="step-indicator">STEP 0 / 0</span>
+            </div>
+          </div>
+
+          <!-- Virtual Alphanumeric Keypad -->
+          <div class="virtual-keypad">
+            <div id="keypad-symbol-buttons" class="keypad-symbols">
+              <!-- Dynamically populated based on chamber alphabet -->
+            </div>
+            <div class="keypad-actions">
+              <button id="btn-keypad-backspace" class="keypad-btn action-key">BKSP</button>
+              <button id="btn-keypad-clear" class="keypad-btn action-key">CLEAR</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- SCREEN 4: MACHINE CONSTRUCTION WORKSHOP -->
+  <main id="screen-workshop" class="game-screen">
+    <div class="workshop-layout">
+      <div class="workshop-header">
+        <h2>AUTOMATA CONSTRUCTION WORKSHOP</h2>
+        <p>Design custom DFAs, inspect transitions, simulate test inputs, and export to official JFLAP (.jff XML).</p>
+        <button class="menu-btn small btn-back-title">RETURN TO TERMINAL</button>
+      </div>
+
+      <div class="workshop-main">
+        <div class="workshop-canvas-box">
+          <div id="ws-canvas" class="canvas-container"></div>
+        </div>
+
+        <div class="workshop-controls-sidebar">
+          <div id="ws-selected-state-label" class="ws-sel-badge">No state selected</div>
+          <div class="ws-btn-group">
+            <button id="ws-add-state-btn" class="action-btn">ADD STATE</button>
+            <button id="ws-toggle-init-btn" class="action-btn">SET AS INITIAL</button>
+            <button id="ws-toggle-final-btn" class="action-btn">TOGGLE ACCEPTING</button>
+            <button id="ws-delete-state-btn" class="action-btn danger">DELETE STATE</button>
+          </div>
+
+          <div class="ws-trans-form">
+            <div class="form-title">ADD / UPDATE TRANSITION</div>
+            <div class="form-row">
+              <label>From: <select id="ws-trans-from"></select></label>
+              <label>Read: <select id="ws-trans-sym"><option value="0">0</option><option value="1">1</option></select></label>
+              <label>To: <select id="ws-trans-to"></select></label>
+            </div>
+            <button id="ws-set-trans-btn" class="action-btn primary small-btn">SET TRANSITION</button>
+          </div>
+
+          <div class="ws-test-box">
+            <div class="form-title">SIMULATE CUSTOM MACHINE</div>
+            <div class="ws-input-row">
+              <input type="text" id="ws-test-input" placeholder="Enter string (e.g. 0101)">
+              <button id="ws-test-btn" class="action-btn primary small-btn">TEST</button>
+            </div>
+            <div id="ws-test-result" class="ws-test-output"></div>
+          </div>
+
+          <button id="ws-export-jflap-btn" class="menu-btn primary">EXPORT TO JFLAP (.JFF)</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SCREEN 5: EXAMINER DEMONSTRATION MODE -->
+  <main id="screen-examiner" class="game-screen">
+    <div class="examiner-layout">
+      <div class="examiner-topbar">
+        <div>
+          <h2>FACULTY EXAMINER DEMONSTRATION CONSOLE</h2>
+          <p>Instant chamber access, formal 5-tuples, full transition tables, custom execution traces, and JFLAP verification.</p>
+        </div>
+        <div class="examiner-topbar-controls">
+          <label>SELECT CHAMBER:
+            <select id="examiner-chamber-select"></select>
+          </label>
+          <button id="examiner-jump-btn" class="action-btn primary small-btn">PLAY CHAMBER</button>
+          <button class="menu-btn small btn-back-title">EXIT EXAMINER</button>
+        </div>
+      </div>
+
+      <div class="examiner-grid">
+        <!-- Left: Specifications & Tables -->
+        <div class="examiner-col-left">
+          <h3 id="examiner-title">Chamber 1</h3>
+          <div id="examiner-topic" class="topic-chip">Topic</div>
+
+          <div class="spec-card">
+            <h4>FORMAL 5-TUPLE DEFINITION M = (Q, Σ, δ, q₀, F)</h4>
+            <div id="examiner-tuple" class="tuple-details"></div>
+          </div>
+
+          <div class="spec-card">
+            <h4>TRANSITION FUNCTION δ TABLE</h4>
+            <div id="examiner-table" class="table-wrapper"></div>
+          </div>
+
+          <div class="spec-card">
+            <h4>OFFICIAL VERIFIED EXAMPLES</h4>
+            <div id="examiner-samples" class="sample-pills-list"></div>
+          </div>
+        </div>
+
+        <!-- Right: Visualizer & Custom Trace -->
+        <div class="examiner-col-right">
+          <div class="examiner-radar-box">
+            <div class="radar-header">INDEPENDENT TOPOLOGY RADAR</div>
+            <div id="examiner-visualizer" class="canvas-container"></div>
+          </div>
+
+          <div class="examiner-eval-box">
+            <h4>CUSTOM INPUT EVALUATION</h4>
+            <div class="eval-input-row">
+              <input type="text" id="examiner-input" placeholder="Enter custom test string">
+              <button id="examiner-test-btn" class="action-btn primary">TRACE EXECUTION</button>
+            </div>
+            <div id="examiner-result" class="examiner-trace-output">
+              <span class="prompt">Select a test string or enter custom symbols above to trace execution.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- SCREEN 6: COMPLETION / ESCAPE SCREEN -->
+  <main id="screen-completion" class="game-screen">
+    <div class="completion-container">
+      <div class="completion-emblem">ARCHIVE BREACHED</div>
+      <h2>YOU HAVE REACHED THE EXTRACTION GATE</h2>
+      <p class="completion-text">
+        All seven memory chambers have been mathematically resolved.
+        Redundant states were folded into canonical minimal cores.
+        The Warden's deceptive machine claims were exposed with minimal witness strings.
+        The Product Gate has opened. Human memories remain intact and uncompressed.
+      </p>
+
+      <div class="mara-final-transmission">
+        <div class="intercom-badge speaker-mara">MARA // FINAL LOG</div>
+        <p>"We made it through. You proved that identity isn't just appearances—it's how a system behaves across every possible continuation. The Archive is offline. We're free."</p>
+      </div>
+
+      <div class="completion-actions">
+        <button class="menu-btn primary btn-back-corridor">REVIEW FACILITY CHAMBERS</button>
+        <button class="menu-btn btn-back-title">RETURN TO MAIN TERMINAL</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- CONFIGURATION MODAL -->
+  <div id="modal-settings" class="modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>SYSTEM CONFIGURATION</h3>
+        <button id="btn-settings-close" class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="config-row">
+          <label>
+            <input type="checkbox" id="setting-reduce-motion">
+            Reduce Visual Motion & Flashes
+          </label>
+        </div>
+        <div class="config-row">
+          <label>
+            <input type="checkbox" id="setting-crt-scanlines" checked>
+            CRT Terminal Scanline Filter
+          </label>
+        </div>
+        <div class="config-danger-zone">
+          <button id="btn-reset-data" class="action-btn danger">RESET ALL ARCHIVE PROGRESS</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT INCLUDES -->
+  <script src="js/engine.js"></script>
+  <script src="js/chambers.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/visualization.js"></script>
+  <script src="js/workshop.js"></script>
+  <script src="js/examiner.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
