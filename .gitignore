@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+venv/
+
+# Temporaries
+*.swp
+*.swo
+*.pyc
+__pycache__/
+
+# ZIP archives (keep source, not zips)
+*.zip
+
+# FOLD_OLD_ARCHIVE (keep local only)
+FOLD_OLD_ARCHIVE/
+
+# FOLD_INDEPENDENT_REVIEW_PACKAGE (local only)
+FOLD_INDEPENDENT_REVIEW_PACKAGE/
+
+# FOLD_LAST_TRANSITION_FINAL (local only)
+THE_LAST_TRANSITION_FINAL/
+
+# FOLD_FINAL.zip original ZIP
+FOLD_FINAL.zip
+
+# Generated reports (if not needed in repo)
+FOLD_*_REPORT.md
+
+# Logs and debugging
+logs/
+debug/
